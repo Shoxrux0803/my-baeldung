@@ -3,10 +3,12 @@ package uz.personal.domain.auth;
 import lombok.*;
 import org.springframework.util.StringUtils;
 import uz.personal.domain.Auditable;
+import uz.personal.domain.article._Article;
 import uz.personal.enums.UserType;
 
 import javax.persistence.*;
 import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Getter
@@ -17,30 +19,38 @@ import java.util.Collection;
 @Table(name = "auth_users")
 public class _User extends Auditable {
 
-    @Column(name = "first_name")
+    @Column
     private String firstName;
-    @Column(name = "last_name")
+
+    @Column
     private String lastName;
-    @Column(name = "middle_name")
+
+    @Column
     private String middleName;
 
     @Enumerated(EnumType.STRING)
     private UserType userType;
 
-    @Column(name = "username", unique = true)
+    @Column(unique = true)
     private String username;
-    @Column(name = "password")
+
+    @Column
     private String password;
 
-    @Column(name = "email", unique = true)
+    @Column(unique = true)
     private String email;
-    @Column(name = "phone", unique = true)
+
+    @Column(unique = true)
     private String phone;
 
     @Column(name = "is_locked", columnDefinition = "boolean default false")
     private boolean locked;
+
     @Column(name = "is_system_admin", columnDefinition = "boolean default false")
     private boolean systemAdmin;
+
+    @OneToMany(mappedBy = "user")
+    List<_Article> article;
 
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinTable(name = "auth_users_roles",

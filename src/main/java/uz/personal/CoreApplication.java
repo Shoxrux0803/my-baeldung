@@ -14,26 +14,26 @@ import javax.sql.DataSource;
 @SpringBootApplication
 public class CoreApplication extends SpringBootServletInitializer {
 
-    @Value("${spring.liquibase.change-log}")
-    private String changeLogDir;
-
-    @Autowired
-    private DataSource dataSource;
+//    @Value("${spring.liquibase.change-log}")
+//    private String changeLogDir;
+//
+//    @Autowired
+//    private DataSource dataSource;
 
     public static void main(String[] args) {
         SpringApplication.run(CoreApplication.class, args);
     }
 
-    @Override
-    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
-        return application.sources(CoreApplication.class);
-    }
-
-    @Bean
-    public SpringLiquibase liquibase() {
-        SpringLiquibase liquibase = new SpringLiquibase();
-        liquibase.setChangeLog(changeLogDir);
-        liquibase.setDataSource(dataSource);
-        return liquibase;
-    }
+//    @Override
+//    protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+//        return application.sources(CoreApplication.class);
+//    }
+//
+//    @Bean
+//    public SpringLiquibase liquibase() {
+//        SpringLiquibase liquibase = new SpringLiquibase();
+//        liquibase.setChangeLog(changeLogDir);
+//        liquibase.setDataSource(dataSource);
+//        return liquibase;
+//    }
 }
