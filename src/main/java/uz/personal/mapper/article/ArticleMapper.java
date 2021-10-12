@@ -16,4 +16,6 @@ public interface ArticleMapper extends BaseMapper<_Article, ArticleDto, ArticleC
 
     @Override
     ArticleDto toDto(_Article entity);
+
+
 }

@@ -31,4 +31,15 @@ public interface Permissions {
     String PERMISSION_CREATE = "PERMISSION_CREATE";
     String PERMISSION_UPDATE = "PERMISSION_UPDATE";
     String PERMISSION_DELETE = "PERMISSION_DELETE";
+
+    /**
+     * ARTICLE
+     */
+
+    String ARTICLE = "ARTICLE";
+    String ARTICLE_READ = "ARTICLE_READ";
+    String ARTICLE_CREATE = "ARTICLE_CREATE";
+    String ARTICLE_UPDATE = "ARTICLE_UPDATE";
+    String ARTICLE_DELETE = "ARTICLE_DELETE";
+
 }

@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uz.personal.dto.GenericCrudDto;
+import uz.personal.dto.GenericDto;
 
 import javax.validation.constraints.Size;
 
@@ -21,7 +22,8 @@ public class ArticleCreateDto extends GenericCrudDto {
     @Size(min = 10, message = " min size %s")
     String text;
 
-
 //    List<LinkCreateDto> links;
+
+    GenericDto user;
 
 }
