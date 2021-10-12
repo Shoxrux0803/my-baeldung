@@ -55,14 +55,14 @@ public class LinkService extends GenericCrudService<_Link, LinkDto, LinkCreateDt
         _Link link = repository.find(LinkCriteria.childBuilder().selfId(id).build());
         validate(link, id);
         LinkDto linkDto = linkMapper.toDto(link);
-        linkDto.setArticleId(link.getArticle().getId());
+//        linkDto.setArticleId(link.getArticle().getId());
         return new ResponseEntity<>(new DataDto<>(linkDto), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<DataDto<List<LinkDto>>> getAll(LinkCriteria criteria) {
         Long total = repository.getTotalCount(criteria);
-        List<LinkDto> linkDto = linkMapper.toDto(repository.findAll(criteria));
+//        List<LinkDto> linkDto = linkMapper.toDto(repository.findAll(criteria));
         return new ResponseEntity<>(new DataDto<>(linkMapper.toDto(repository.findAll(criteria)), total), HttpStatus.OK);
 
     }

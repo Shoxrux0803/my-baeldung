@@ -3,6 +3,7 @@ package uz.personal.controller.auth;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import uz.personal.controller.ApiController;
 import uz.personal.criteria.auth.UserCriteria;
@@ -57,6 +58,7 @@ public class UserController extends ApiController<IUserService> {
 
     @ApiOperation(value = "Role Attach To User")
     @RequestMapping(value = API_PATH + V_1 + "/user/attach/role", method = RequestMethod.POST)
+    @Transactional
     public ResponseEntity<DataDto<UserDto>> attachRoles(@RequestBody AttachRoleDto dto) {
         return service.attachRolesToUser(dto);
     }
