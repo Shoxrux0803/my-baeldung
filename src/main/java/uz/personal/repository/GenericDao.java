@@ -183,6 +183,10 @@ public abstract class GenericDao<T extends Auditable, C extends GenericCriteria>
         save(entity);
     }
 
+    protected String prepareLikeCause(String value){
+        return "%".concat(value).concat("%").toLowerCase();
+    }
+
     public Session getSession() {
         return entityManager.unwrap(Session.class);
     }

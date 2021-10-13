@@ -24,13 +24,17 @@ public class _Article extends Auditable {
     Boolean allowPublication;
 
     // commentga ruxsat
+    @Column(columnDefinition = "boolean default false")
     Boolean allowComment;
 
-    @OneToMany(mappedBy = "article")
-    List<_Link> roles;
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
+    List<_Link> links;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     _User user;
+
+    @Column
+    Long rate;
 
 }

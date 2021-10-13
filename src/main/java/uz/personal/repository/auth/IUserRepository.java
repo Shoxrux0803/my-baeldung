@@ -8,4 +8,6 @@ public interface IUserRepository extends IGenericCrudRepository<_User, UserCrite
 
     _User findByUsername(String username);
 
+    _User findById(Long id);
+
 }

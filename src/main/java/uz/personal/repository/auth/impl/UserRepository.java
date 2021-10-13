@@ -23,8 +23,11 @@ public class UserRepository extends GenericDao<_User, UserCriteria> implements I
      */
     protected final Log logger = LogFactory.getLog(getClass());
 
-    @Autowired
-    protected EntityManager entityManager;
+    protected final EntityManager entityManager;
+
+    public UserRepository(EntityManager entityManager) {
+        this.entityManager = entityManager;
+    }
 
     @Override
     protected void defineCriteriaOnQuerying(UserCriteria criteria, List<String> whereCause, Map<String, Object> params, StringBuilder queryBuilder) {
@@ -64,6 +67,16 @@ public class UserRepository extends GenericDao<_User, UserCriteria> implements I
         } catch (NoResultException ex) {
             logger.error(ex.getMessage());
             throw new RuntimeException(String.format("User with username '%s' not found", username));
+        }
+    }
+
+    @Override
+    public _User findById(Long id) {
+        try {
+            return (_User) entityManager.createQuery("SELECT t FROM _User t WHERE t.id = '" + id + "' ORDER BY t.id DESC ").getSingleResult();
+        } catch (NoResultException ex) {
+            logger.error(ex.getMessage());
+            throw new RuntimeException(String.format("User with id '%s' not found", id));
         }
     }
 }

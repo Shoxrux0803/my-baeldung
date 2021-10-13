@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import uz.personal.domain.article._Link;
-import uz.personal.domain.auth._User;
 import uz.personal.dto.GenericDto;
 
 import java.util.List;
@@ -18,10 +17,14 @@ public class ArticleDto extends GenericDto {
 
     String text;
 
-    boolean allowPublication;
+//    Boolean allowPublication;
 
-    List<_Link> roles;
+    Boolean allowComment;
 
-    List<_User> user;
+    Long rate;
+
+    List<LinkDto> links;
+
+//    List<_User> user;
 
 }

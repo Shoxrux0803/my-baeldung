@@ -49,14 +49,14 @@ public class _User extends Auditable {
     @Column(name = "is_system_admin", columnDefinition = "boolean default false")
     private boolean systemAdmin;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     List<_Article> article;
 
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinTable(name = "auth_users_roles",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
-    private Collection<_Role> roles;
+    private List<_Role> roles;
 
     public String getShortName() {
         return String.format("%s %s",
