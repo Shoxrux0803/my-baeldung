@@ -42,6 +42,7 @@ public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDt
     private final GenericMapper genericMapper;
     private final IArticleRepository articleRepository;
 
+
     @Autowired
     public RateService(IRateRepository repository, BaseUtils utils, IErrorRepository errorRepository, RateMapper rateMapper, GenericMapper genericMapper, IUserRepository userRepository, IUserRepository userRepository1, IArticleRepository articleRepository) {
         super(repository, utils, errorRepository);
@@ -132,6 +133,10 @@ public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDt
         List<_Rate> rate = repository.findAll(rateCriteria);
 
 //       ;
+
+        if (rate!=null){
+            System.out.println("bouaygfp");
+        }
 
         _Article article = articleRepository.find(dto.getId());
        Double rateArticle = (rate.stream().mapToLong(_Rate::getRate).sum()) * 1. / rate.size();
