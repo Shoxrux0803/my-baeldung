@@ -1,6 +1,7 @@
 package uz.personal.service.article.impl;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.istack.NotNull;
@@ -144,5 +145,15 @@ public class LinkService extends GenericCrudService<_Link, LinkDto, LinkCreateDt
         }
     }
 
+    @Transactional
+    public ResponseEntity<DataDto<Boolean>> deleteAll(Long id) {
+        LinkCriteria linkCriteria = new LinkCriteria();
+        linkCriteria.setArticleId(id);
+        List<_Link> linkList = repository.findAll(linkCriteria);
+
+        linkList.forEach(repository::delete);
+
+        return new ResponseEntity<>(new DataDto<>(true), HttpStatus.OK);
+    }
 
 }

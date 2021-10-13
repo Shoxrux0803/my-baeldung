@@ -1,13 +1,14 @@
 package uz.personal.domain.auth;
 
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.springframework.util.StringUtils;
 import uz.personal.domain.Auditable;
 import uz.personal.domain.article._Article;
+import uz.personal.domain.article._Post;
 import uz.personal.enums.UserType;
 
 import javax.persistence.*;
-import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -17,46 +18,50 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "auth_users")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class _User extends Auditable {
 
     @Column
-    private String firstName;
+    String firstName;
 
     @Column
-    private String lastName;
+    String lastName;
 
     @Column
-    private String middleName;
+    String middleName;
 
     @Enumerated(EnumType.STRING)
-    private UserType userType;
+    UserType userType;
 
     @Column(unique = true)
-    private String username;
+    String username;
 
     @Column
-    private String password;
+    String password;
 
     @Column(unique = true)
-    private String email;
+    String email;
 
     @Column(unique = true)
-    private String phone;
+    String phone;
 
     @Column(name = "is_locked", columnDefinition = "boolean default false")
-    private boolean locked;
+    boolean locked;
 
     @Column(name = "is_system_admin", columnDefinition = "boolean default false")
-    private boolean systemAdmin;
+    boolean systemAdmin;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     List<_Article> article;
 
-    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    List<_Post> commentList;
+
+    @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(name = "auth_users_roles",
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")})
-    private List<_Role> roles;
+    List<_Role> roles;
 
     public String getShortName() {
         return String.format("%s %s",

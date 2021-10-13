@@ -29,12 +29,12 @@ public class LinkRepository extends GenericDao<_Link, LinkCriteria> implements I
         }
 
         if (!utils.isEmpty(criteria.getLink())) {
-            whereCause.add("t.link = : link");
-            params.put("link", criteria.getLink());
+            whereCause.add("t.link like :link");
+            params.put("link", prepareLikeCause(criteria.getLink()));
         }
 
         if (!utils.isEmpty(criteria.getArticleId())) {
-            whereCause.add("t.article = : id");
+            whereCause.add("t.article.id = :id");
             params.put("id", criteria.getArticleId());
         }
 

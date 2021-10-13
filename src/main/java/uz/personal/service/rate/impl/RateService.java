@@ -79,7 +79,7 @@ public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDt
 
         rate.setArticle(article);
         repository.save(rate);
-        return new ResponseEntity<>(new DataDto<>(genericMapper.fromDomain(article)), HttpStatus.CREATED);
+        return new ResponseEntity<>(new DataDto<>(genericMapper.fromDomain(rate)), HttpStatus.CREATED);
     }
 
 
@@ -111,35 +111,15 @@ public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDt
     }
 
 
-//    @Autowired
-//    public ResponseEntity<DataDto<Double>> avgRate(@NotNull GenericDto genericDto) {
-//        RateCriteria rateCriteria=new RateCriteria();
-//        rateCriteria.setArticleId(genericDto.getId());
-//        List<_Rate> rate = repository.findAll(rateCriteria);
-//
-////       ;
-//
-////        Long r=rateArticle*
-//         Double rateArticle = (rate.stream().mapToLong(_Rate::getRate).sum()) * 1. / rate.size();
-//        _Article article = articleRepository.find(genericDto.getId());
-//        article.setRate(rateArticle);
-//        return new ResponseEntity<>(new DataDto<>(true), HttpStatus.OK);
-//    }
-
     @Override
     public ResponseEntity<DataDto<Double>> avgRate(@NotNull GenericDto dto) {
         RateCriteria rateCriteria = new RateCriteria();
         rateCriteria.setArticleId(dto.getId());
         List<_Rate> rate = repository.findAll(rateCriteria);
 
-//       ;
-
-        if (rate!=null){
-            System.out.println("bouaygfp");
-        }
-
         _Article article = articleRepository.find(dto.getId());
-       Double rateArticle = (rate.stream().mapToLong(_Rate::getRate).sum()) * 1. / rate.size();
+        assert rate != null;
+        Double rateArticle = (rate.stream().mapToLong(_Rate::getRate).sum()) * 1. / rate.size();
         article.setRate(rateArticle);
         return new ResponseEntity<>(new DataDto<>(article.getRate()), HttpStatus.OK);
 

@@ -30,5 +30,4 @@ public class _Rate extends Auditable {
 
 
 
-
 }

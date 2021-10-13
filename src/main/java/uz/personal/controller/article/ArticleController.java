@@ -30,11 +30,11 @@ public class ArticleController extends ApiController<IArticleService> {
         return service.get(id);
     }
 
-    @ApiOperation(value = "Get List Article")
-    @RequestMapping(value = API_PATH + V_1 + "/article/get/all", method = RequestMethod.GET)
-    public ResponseEntity<DataDto<List<ArticleDto>>> getAllArticles(@Valid ArticleCriteria criteria) {
-        return service.getAll(criteria);
-    }
+//    @ApiOperation(value = "Get List Article")
+//    @RequestMapping(value = API_PATH + V_1 + "/article/get/all", method = RequestMethod.GET)
+//    public ResponseEntity<DataDto<List<ArticleDto>>> getAllArticles(@Valid ArticleCriteria criteria) {
+//        return service.getAll(criteria);
+//    }
 
     @ApiOperation(value = "Article Create")
     @RequestMapping(value = API_PATH + V_1 + "/article/create", method = RequestMethod.POST)

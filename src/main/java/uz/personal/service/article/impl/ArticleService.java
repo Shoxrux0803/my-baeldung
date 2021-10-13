@@ -119,6 +119,8 @@ public class ArticleService extends GenericCrudService<_Article, ArticleDto, Art
         article.setState(State.DELETED);
         validate(article, id);
 
+        linkService.deleteAll(id);
+
         repository.save(article);// article bazaadan ochirish kerakmi
         return new ResponseEntity<>(new DataDto<>(true), HttpStatus.OK);
     }

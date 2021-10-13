@@ -1,8 +1,10 @@
 package uz.personal.domain.article;
 
 import lombok.*;
+import lombok.experimental.FieldDefaults;
 import uz.personal.domain.Auditable;
 import uz.personal.domain.auth._User;
+import uz.personal.domain.rate._Rate;
 
 import javax.persistence.*;
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Table(name = "article")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class _Article extends Auditable {
 
     @Column(columnDefinition = "text")
@@ -30,11 +33,17 @@ public class _Article extends Auditable {
     @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     List<_Link> links;
 
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
+    List<_Rate> rateList;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     _User user;
 
     @Column
-    Long rate;
+    Double rate;
+
+    @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
+    List<_Post> comments;
 
 }

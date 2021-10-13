@@ -6,6 +6,8 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import uz.personal.dto.GenericCrudDto;
 
+import javax.validation.constraints.Size;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -15,6 +17,7 @@ import uz.personal.dto.GenericCrudDto;
 public class RateCreateDto extends GenericCrudDto {
 
     @ApiModelProperty(required = true)
+    @Size(max = 5, message = "Rate must be between 0 and 5")
     Integer rate;
 
     Long articleId;
