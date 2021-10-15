@@ -1,4 +1,4 @@
-package uz.personal.criteria.rate;
+package uz.personal.criteria.article;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -18,10 +18,13 @@ public class RateCriteria extends GenericCriteria {
 
     Long articleId;
 
+    Long userId;
+
     @Builder(builderMethodName = "childBuilder")
-    public RateCriteria(Long selfId, Integer page, Integer perPage, String sortBy, String sortDirection, Integer rate, Long articleId) {
+    public RateCriteria(Long selfId, Integer page, Integer perPage, String sortBy, String sortDirection, Integer rate, Long articleId, Long userId) {
         super(selfId, page, perPage, sortBy, sortDirection);
         this.rate = rate;
         this.articleId = articleId;
+        this.userId = userId;
     }
 }

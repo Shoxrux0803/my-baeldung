@@ -6,6 +6,7 @@ import org.springframework.util.StringUtils;
 import uz.personal.domain.Auditable;
 import uz.personal.domain.article._Article;
 import uz.personal.domain.article._Post;
+import uz.personal.domain.article._Rate;
 import uz.personal.enums.UserType;
 
 import javax.persistence.*;
@@ -50,6 +51,9 @@ public class _User extends Auditable {
 
     @Column(name = "is_system_admin", columnDefinition = "boolean default false")
     boolean systemAdmin;
+
+    @OneToMany(mappedBy = "user")
+    List<_Rate> rate;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     List<_Article> article;

@@ -17,6 +17,8 @@ public class ArticleDto extends GenericDto {
 
     String text;
 
+    String title;
+
 //    Boolean allowPublication;
 
     Boolean allowComment;
@@ -24,6 +26,12 @@ public class ArticleDto extends GenericDto {
     Long rate;
 
     List<LinkDto> links;
+
+    List<PostDto> postDtoList;
+
+    List<RateDto> rateDtoList;
+
+    Long viewCount;
 
 //    List<_User> user;
 

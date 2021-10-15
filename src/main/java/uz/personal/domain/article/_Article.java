@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import uz.personal.domain.Auditable;
 import uz.personal.domain.auth._User;
-import uz.personal.domain.rate._Rate;
 
 import javax.persistence.*;
 import java.util.List;
@@ -22,13 +21,19 @@ public class _Article extends Auditable {
     @Column(columnDefinition = "text")
     String text;
 
+    @Column(columnDefinition = "text")
+    String title;
+
+    @Column(columnDefinition = "bigint default 0")
+    Long viewCount;
+
     // maqolani ko`rishga ruxsat berish
     @Column(columnDefinition = "boolean default false")
-    Boolean allowPublication;
+    Boolean allowPublication = Boolean.FALSE;
 
     // commentga ruxsat
     @Column(columnDefinition = "boolean default false")
-    Boolean allowComment;
+    Boolean allowComment = Boolean.FALSE;
 
     @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)
     List<_Link> links;
@@ -40,7 +45,7 @@ public class _Article extends Auditable {
     @JoinColumn(name = "user_id")
     _User user;
 
-    @Column
+    @Column(columnDefinition = "double precision default 0.0")
     Double rate;
 
     @OneToMany(mappedBy = "article", fetch = FetchType.LAZY)

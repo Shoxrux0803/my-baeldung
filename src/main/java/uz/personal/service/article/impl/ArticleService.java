@@ -42,15 +42,19 @@ public class ArticleService extends GenericCrudService<_Article, ArticleDto, Art
     private final ArticleMapper articleMapper;
     private final ObjectMapper objectMapper;
     private final LinkService linkService;
+    private final RateService rateService;
+    private final PostService postService;
 
     @Autowired
-    public ArticleService(IArticleRepository repository, BaseUtils utils, IErrorRepository errorRepository, IUserRepository userRepository, GenericMapper genericMapper, ArticleMapper articleMapper, ObjectMapper objectMapper, LinkService linkService) {
+    public ArticleService(IArticleRepository repository, BaseUtils utils, IErrorRepository errorRepository, IUserRepository userRepository, GenericMapper genericMapper, ArticleMapper articleMapper, ObjectMapper objectMapper, LinkService linkService, RateService rateService, PostService postService) {
         super(repository, utils, errorRepository);
         this.userRepository = userRepository;
         this.genericMapper = genericMapper;
         this.articleMapper = articleMapper;
         this.objectMapper = objectMapper;
         this.linkService = linkService;
+        this.rateService = rateService;
+        this.postService = postService;
     }
 
 
@@ -120,6 +124,8 @@ public class ArticleService extends GenericCrudService<_Article, ArticleDto, Art
         validate(article, id);
 
         linkService.deleteAll(id);
+        postService.deleteAll(id);
+        rateService.deleteAll(id);
 
         repository.save(article);// article bazaadan ochirish kerakmi
         return new ResponseEntity<>(new DataDto<>(true), HttpStatus.OK);

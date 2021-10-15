@@ -1,4 +1,4 @@
-package uz.personal.dto.rate;
+package uz.personal.dto.article;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -25,7 +25,10 @@ public class RateUpdateDto extends GenericCrudDto {
     @ApiModelProperty(required = true)
     Double rate;
 
-    @ApiModelProperty
+    @ApiModelProperty(required = true)
     Long  articleId;
+
+    @ApiModelProperty(required = true)
+    Long userId;
 
 }

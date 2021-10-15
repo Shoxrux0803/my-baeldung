@@ -9,6 +9,8 @@ import lombok.Setter;
 import uz.personal.dto.GenericCrudDto;
 import uz.personal.dto.GenericDto;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Getter
@@ -22,8 +24,13 @@ public class ArticleCreateDto extends GenericCrudDto {
     @Size(min = 10, message = " min size %s")
     String text;
 
+    @NotNull(message = "Title cannot be null!")
+    @NotEmpty(message = "Title cannot be empty!")
+    String title;
 //    List<LinkCreateDto> links;
 
+    @NotNull(message = "User id cannot be null!")
+    @NotEmpty(message = "User id cannot be empty!")
     GenericDto user;
 
 }

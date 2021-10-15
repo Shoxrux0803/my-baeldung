@@ -18,6 +18,7 @@ import uz.personal.dto.article.PostCreateDto;
 import uz.personal.dto.article.PostDto;
 import uz.personal.dto.article.PostUpdateDto;
 import uz.personal.enums.ErrorCodes;
+import uz.personal.exception.GenericRuntimeException;
 import uz.personal.exception.IdRequiredException;
 import uz.personal.exception.ValidationException;
 import uz.personal.mapper.GenericMapper;
@@ -75,8 +76,20 @@ public class PostService extends GenericCrudService<_Post, PostDto, PostCreateDt
     public ResponseEntity<DataDto<GenericDto>> create(final PostCreateDto dto) {
 
         _Article article = articleRepository.find(dto.getArticleId());
+        if (utils.isEmpty(article)) {
+            logger.error(String.format("Article with id '%s' not found", dto.getArticleId()));
+            throw new ValidationException(errorRepository.getErrorMessage(ErrorCodes.USER_NOT_FOUND_ID, utils.toErrorParams("Article", dto.getArticleId())));
+        }
+
+        if (!article.getAllowComment()){
+            throw new GenericRuntimeException("You cannot write comment to this article!");
+        }
 
         _User user = userRepository.find(dto.getUserId());
+        if (utils.isEmpty(user)) {
+            logger.error(String.format("User with id '%s' not found", dto.getUserId()));
+            throw new ValidationException(errorRepository.getErrorMessage(ErrorCodes.USER_NOT_FOUND_ID, utils.toErrorParams("User", dto.getUserId())));
+        }
 
         _Post post = postMapper.fromCreateDto(dto);
 
@@ -108,7 +121,7 @@ public class PostService extends GenericCrudService<_Post, PostDto, PostCreateDt
         try {
             objectMapper.updateValue(post, dto);
         } catch (JsonMappingException e) {
-            throw new RuntimeException("The link has not been changed!!!"); // todo PM new exception
+            throw new GenericRuntimeException("The link has not been updated!!!"); // todo PM new exception
         }
 
 //        baseValidation(link);

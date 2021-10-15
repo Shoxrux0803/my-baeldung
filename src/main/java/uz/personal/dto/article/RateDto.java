@@ -1,4 +1,4 @@
-package uz.personal.dto.rate;
+package uz.personal.dto.article;
 
 import lombok.*;
 import uz.personal.dto.GenericDto;
@@ -13,13 +13,17 @@ public class RateDto extends GenericDto {
 
       Integer rate;
 
+      Long articleId;
+
+      Long userId;
 
     // ArticleDto article;
 
-      @Builder(builderMethodName = "childBuilder")
-    public RateDto(Long id, Integer rate, ArticleDto article) {
+    @Builder(builderMethodName = "childBuilder")
+    public RateDto(Long id, Integer rate, Long articleId, Long userId) {
         super(id);
         this.rate = rate;
-       // this.article = article;
+        this.articleId = articleId;
+        this.userId = userId;
     }
 }

@@ -1,17 +1,17 @@
-package uz.personal.controller.rate;
+package uz.personal.controller.article;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uz.personal.controller.ApiController;
-import uz.personal.criteria.rate.RateCriteria;
+import uz.personal.criteria.article.RateCriteria;
 import uz.personal.dto.GenericDto;
-import uz.personal.dto.rate.RateCreateDto;
-import uz.personal.dto.rate.RateDto;
-import uz.personal.dto.rate.RateUpdateDto;
+import uz.personal.dto.article.RateCreateDto;
+import uz.personal.dto.article.RateDto;
+import uz.personal.dto.article.RateUpdateDto;
 import uz.personal.response.DataDto;
-import uz.personal.service.rate.IRateService;
+import uz.personal.service.article.IRateService;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -38,33 +38,39 @@ public class RateController extends ApiController<IRateService> {
         return service.getAll(criteria);
     }
 
-    @ApiOperation(value = "rate Create")
+    @ApiOperation(value = "Rate Create")
     @RequestMapping(value = API_PATH + V_1 + "/rate/create", method = RequestMethod.POST)
-    public ResponseEntity<DataDto<GenericDto>> createRate(@RequestBody RateCreateDto dto) {
+    public ResponseEntity<DataDto<GenericDto>> createRate(@Valid @RequestBody RateCreateDto dto) {
         return service.create(dto);
     }
 
     @Transactional
-    @ApiOperation(value = "rate Update")
+    @ApiOperation(value = "Rate Update")
     @RequestMapping(value = API_PATH + V_1 + "/rate/update", method = RequestMethod.PUT)
     public ResponseEntity<DataDto<RateDto>> updateRate(@RequestBody RateUpdateDto dto) {
         return service.update(dto);
     }
 
     @Transactional
-    @ApiOperation(value = "rate Delete")
+    @ApiOperation(value = "Rate Delete")
     @RequestMapping(value = API_PATH + V_1 + "/rate/delete/{id}", method = RequestMethod.DELETE)
     public ResponseEntity<DataDto<Boolean>> deleteRAte(@PathVariable(value = "id") Long id) {
         return service.delete(id);
     }
 
-
-    @Transactional
-    @ApiOperation(value = "rate AvgRate")
-    @RequestMapping(value = API_PATH + V_1 + "/rate/getRateByArticleId", method = RequestMethod.PUT)
-    public ResponseEntity<DataDto<Double>> avgRate(@RequestBody GenericDto dto) {
-        return service.avgRate(dto);
+    @ApiOperation(value = "Rate Delete All")
+    @RequestMapping(value = API_PATH + V_1 + "/rate/deleteAllByArticleID/{articleId}", method = RequestMethod.DELETE)
+    public ResponseEntity<DataDto<Boolean>> deleteAll(@PathVariable(value = "articleId") Long articleId) {
+        return service.deleteAll(articleId);
     }
+
+
+//    @Transactional
+//    @ApiOperation(value = "rate AvgRate")
+//    @RequestMapping(value = API_PATH + V_1 + "/rate/getRateByArticleId", method = RequestMethod.PUT)
+//    public ResponseEntity<DataDto<Double>> avgRate(@RequestBody Long dto) {
+//        return service.avgRate(dto);
+//    }
 
 
 }

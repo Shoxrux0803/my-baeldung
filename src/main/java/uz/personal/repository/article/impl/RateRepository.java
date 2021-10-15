@@ -1,10 +1,10 @@
-package uz.personal.repository.rate.impl;
+package uz.personal.repository.article.impl;
 
 import org.springframework.stereotype.Repository;
-import uz.personal.criteria.rate.RateCriteria;
-import uz.personal.domain.rate._Rate;
+import uz.personal.criteria.article.RateCriteria;
+import uz.personal.domain.article._Rate;
 import uz.personal.repository.GenericDao;
-import uz.personal.repository.rate.IRateRepository;
+import uz.personal.repository.article.IRateRepository;
 
 import java.util.List;
 import java.util.Map;
@@ -29,18 +29,13 @@ public class RateRepository extends GenericDao<_Rate, RateCriteria> implements I
             params.put("articleId", criteria.getArticleId());
         }
 
+        if (!utils.isEmpty(criteria.getUserId())) {
+            whereCause.add(" t.user.id = :userId");
+            params.put("userId", criteria.getUserId());
+        }
         onDefineWhereCause(criteria, whereCause, params, queryBuilder);
     }
 
-
-//    @Override
-//    protected StringBuilder joinStringOnQuerying(RateCriteria criteria) {
-//        StringBuilder joinBuilder = new StringBuilder();
-//        if (hasText(criteria.getArticleName())) {
-//            joinBuilder.append(" join _Article a on a = t.article ");
-//        }
-//        return joinBuilder;
-//    }
 }
 
 

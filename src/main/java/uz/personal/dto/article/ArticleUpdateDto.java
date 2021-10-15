@@ -27,6 +27,9 @@ public class ArticleUpdateDto extends GenericCrudDto {
     Long id;
 
     @ApiModelProperty(required = true)
+    String title;
+
+    @ApiModelProperty(required = true)
     String text;
 
     @ApiModelProperty(required = true)
