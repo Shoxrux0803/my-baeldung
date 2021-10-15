@@ -11,5 +11,5 @@ import uz.personal.service.IGenericCrudService;
 
 public interface ILinkService extends IGenericCrudService<_Link, LinkDto, LinkCreateDto, LinkUpdateDto,Long, LinkCriteria> {
 
-    ResponseEntity<DataDto<Boolean>> deleteAll(Long id);
+    ResponseEntity<DataDto<Boolean>> deleteAllByArticleId(Long articleId);
 }

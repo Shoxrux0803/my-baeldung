@@ -11,6 +11,6 @@ import uz.personal.service.IGenericCrudService;
 
 public interface IPostService extends IGenericCrudService<_Post, PostDto, PostCreateDto, PostUpdateDto, Long, PostCriteria> {
 
-    ResponseEntity<DataDto<Boolean>> deleteAll(Long id);
+    ResponseEntity<DataDto<Boolean>> deleteAllByArticleId(Long articleId);
 
 }

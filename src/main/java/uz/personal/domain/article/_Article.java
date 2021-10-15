@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "article")
+@Table(name = "_article")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class _Article extends Auditable {
 

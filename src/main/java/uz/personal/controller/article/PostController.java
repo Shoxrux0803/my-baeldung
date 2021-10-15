@@ -55,9 +55,9 @@ public class PostController extends ApiController<IPostService> {
         return service.delete(id);
     }
 
-    @ApiOperation(value = "Post Delete All")
-    @RequestMapping(value = API_PATH + V_1 + "/post/deleteAll/{articleId}", method = RequestMethod.DELETE)
-    public ResponseEntity<DataDto<Boolean>> deleteAll(@PathVariable(value = "articleId") Long articleId) {
-        return service.deleteAll(articleId);
+    @ApiOperation(value = "Post Delete All By Article Id")
+    @RequestMapping(value = API_PATH + V_1 + "/post/deleteAllByArticleId/{articleId}", method = RequestMethod.DELETE)
+    public ResponseEntity<DataDto<Boolean>> deleteAllByArticleId(@PathVariable(value = "articleId") Long articleId) {
+        return service.deleteAllByArticleId(articleId);
     }
 }

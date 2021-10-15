@@ -144,11 +144,10 @@ public class LinkService extends GenericCrudService<_Link, LinkDto, LinkCreateDt
         }
     }
 
+    @Override
     @Transactional
-    public ResponseEntity<DataDto<Boolean>> deleteAll(Long id) {
-        LinkCriteria linkCriteria = new LinkCriteria();
-        linkCriteria.setArticleId(id);
-        List<_Link> linkList = repository.findAll(linkCriteria);
+    public ResponseEntity<DataDto<Boolean>> deleteAllByArticleId(Long articleId) {
+        List<_Link> linkList = repository.findAll(LinkCriteria.childBuilder().articleId(articleId).build());
 
         linkList.forEach(repository::delete);
 

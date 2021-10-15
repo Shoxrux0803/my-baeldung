@@ -11,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "link")
+@Table(name = "_link")
 public class _Link extends Auditable {
 
     @Column

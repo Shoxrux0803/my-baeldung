@@ -55,9 +55,9 @@ public class LinkController extends ApiController<ILinkService> {
         return service.delete(id);
     }
 
-    @ApiOperation(value = "Link Delete All")
+    @ApiOperation(value = "Link Delete All By Article Id")
     @RequestMapping(value = API_PATH + V_1 + "/link/deleteAll/{articleId}", method = RequestMethod.DELETE)
     public ResponseEntity<DataDto<Boolean>> deleteAll(@PathVariable(value = "articleId") Long articleId) {
-        return service.deleteAll(articleId);
+        return service.deleteAllByArticleId(articleId);
     }
 }

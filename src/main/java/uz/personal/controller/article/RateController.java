@@ -58,10 +58,10 @@ public class RateController extends ApiController<IRateService> {
         return service.delete(id);
     }
 
-    @ApiOperation(value = "Rate Delete All")
+    @ApiOperation(value = "Rate Delete All By Article Id")
     @RequestMapping(value = API_PATH + V_1 + "/rate/deleteAllByArticleID/{articleId}", method = RequestMethod.DELETE)
-    public ResponseEntity<DataDto<Boolean>> deleteAll(@PathVariable(value = "articleId") Long articleId) {
-        return service.deleteAll(articleId);
+    public ResponseEntity<DataDto<Boolean>> deleteAllByArticleId(@PathVariable(value = "articleId") Long articleId) {
+        return service.deleteAllByArticleId(articleId);
     }
 
 

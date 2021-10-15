@@ -15,5 +15,5 @@ import uz.personal.service.IGenericCrudService;
 public interface IRateService extends IGenericCrudService<_Rate, RateDto, RateCreateDto, RateUpdateDto, Long, RateCriteria> {
     ResponseEntity<DataDto<Double>> avgRate(Long dto, _Article article);
 
-    ResponseEntity<DataDto<Boolean>> deleteAll(Long articleId);
+    ResponseEntity<DataDto<Boolean>> deleteAllByArticleId(Long articleId);
 }

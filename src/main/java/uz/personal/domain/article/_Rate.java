@@ -17,7 +17,7 @@ import static lombok.AccessLevel.PRIVATE;
 @NoArgsConstructor
 @Entity
 @Builder
-@Table(name = "rate")
+@Table(name = "_rate")
 @FieldDefaults(level = PRIVATE)
 public class _Rate extends Auditable {
 

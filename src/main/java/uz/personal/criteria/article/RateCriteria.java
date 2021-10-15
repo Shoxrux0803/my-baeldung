@@ -20,8 +20,10 @@ public class RateCriteria extends GenericCriteria {
 
     Long userId;
 
+    boolean rateSum;
+
     @Builder(builderMethodName = "childBuilder")
-    public RateCriteria(Long selfId, Integer page, Integer perPage, String sortBy, String sortDirection, Integer rate, Long articleId, Long userId) {
+        public RateCriteria(Long selfId, Integer page, Integer perPage, String sortBy, String sortDirection, Integer rate, Long articleId, Long userId, boolean rateSum) {
         super(selfId, page, perPage, sortBy, sortDirection);
         this.rate = rate;
         this.articleId = articleId;

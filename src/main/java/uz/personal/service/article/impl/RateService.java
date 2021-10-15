@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uz.personal.criteria.article.LinkCriteria;
 import uz.personal.criteria.article.RateCriteria;
 import uz.personal.domain.article._Article;
 import uz.personal.domain.article._Rate;
@@ -127,16 +128,6 @@ public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDt
         return new ResponseEntity<>(new DataDto<>(true), HttpStatus.OK);
     }
 
-    @Transactional
-    public ResponseEntity<DataDto<Boolean>> deleteAll(Long id) {
-        RateCriteria rateCriteria = new RateCriteria();
-        rateCriteria.setArticleId(id);
-        List<_Rate> rateList = repository.findAll(rateCriteria);
-
-        rateList.forEach(repository::delete);
-
-        return new ResponseEntity<>(new DataDto<>(true), HttpStatus.OK);
-    }
 
     @Override
     public ResponseEntity<DataDto<Double>> avgRate(@NotNull Long dto, final _Article article) {
@@ -151,6 +142,16 @@ public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDt
 
         return new ResponseEntity<>(new DataDto<>(article.getRate()), HttpStatus.OK);
 
+    }
+
+    @Transactional
+    @Override
+    public ResponseEntity<DataDto<Boolean>> deleteAllByArticleId(Long articleId) {
+        List<_Rate> rateList = repository.findAll(RateCriteria.childBuilder().articleId(articleId).build());
+
+        rateList.forEach(repository::delete);
+
+        return new ResponseEntity<>(new DataDto<>(true), HttpStatus.OK);
     }
 
     @Override
@@ -168,5 +169,15 @@ public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDt
             throw new ValidationException(errorRepository.getErrorMessage(ErrorCodes.OBJECT_NOT_FOUND_ID, utils.toErrorParams("Rate", id)));
         }
     }
+
+//    @Override
+//    public Double avgRate(Long article) {
+//        try {
+//            return (_User) entityManager.createQuery("SELECT t FROM _User t WHERE t.id = '" + id + "' ORDER BY t.id DESC ").getSingleResult();
+//        } catch (NoResultException ex) {
+//            logger.error(ex.getMessage());
+//            throw new RuntimeException(String.format("User with id '%s' not found", id));
+//        }
+//    }
 
 }

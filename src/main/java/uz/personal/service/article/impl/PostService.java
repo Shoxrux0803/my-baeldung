@@ -143,11 +143,10 @@ public class PostService extends GenericCrudService<_Post, PostDto, PostCreateDt
         return new ResponseEntity<>(new DataDto<>(true), HttpStatus.OK);
     }
 
+    @Override
     @Transactional
-    public ResponseEntity<DataDto<Boolean>> deleteAll(Long id) {
-        PostCriteria postCriteria = new PostCriteria();
-        postCriteria.setArticleId(id);
-        List<_Post> postList = repository.findAll(postCriteria);
+    public ResponseEntity<DataDto<Boolean>> deleteAllByArticleId(Long articleId) {
+        List<_Post> postList = repository.findAll(PostCriteria.childBuilder().articleId(articleId).build());
 
         postList.forEach(repository::delete);
 
