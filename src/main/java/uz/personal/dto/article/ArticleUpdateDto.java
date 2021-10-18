@@ -7,8 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.validator.constraints.Range;
 import uz.personal.dto.GenericCrudDto;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 import java.util.List;
@@ -24,6 +26,7 @@ import static lombok.AccessLevel.PRIVATE;
 public class ArticleUpdateDto extends GenericCrudDto {
 
     @ApiModelProperty(required = true)
+    @Range(min = 1, message = "Article id must be")
     Long id;
 
     @ApiModelProperty(required = true)

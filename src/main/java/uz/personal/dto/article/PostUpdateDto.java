@@ -22,10 +22,10 @@ public class PostUpdateDto extends GenericCrudDto {
     @ApiModelProperty
     Long id;
 
-//    @ApiModelProperty
+    @ApiModelProperty
     Long articleId;
 
-//    @ApiModelProperty
+    @ApiModelProperty
     Long userId;
 
     @ApiModelProperty

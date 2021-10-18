@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.validator.constraints.Range;
 import uz.personal.dto.GenericCrudDto;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -20,13 +21,15 @@ import static lombok.AccessLevel.PRIVATE;
 public class RateUpdateDto extends GenericCrudDto {
 
     @ApiModelProperty(required = true)
+    @Range(min = 1, message = "Rate Id ")
     Long id;
 
     @ApiModelProperty(required = true)
-    Double rate;
+    @Range(min = 0, max = 5, message = "Rate ")
+    Short rate;
 
     @ApiModelProperty(required = true)
-    Long  articleId;
+    Long articleId;
 
     @ApiModelProperty(required = true)
     Long userId;

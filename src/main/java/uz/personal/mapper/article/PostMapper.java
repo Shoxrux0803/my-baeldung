@@ -17,4 +17,5 @@ public interface PostMapper extends BaseMapper<_Post, PostDto, PostCreateDto, Po
     @Mapping(source = "article.id", target = "articleId")
     @Mapping(source = "user.id", target = "userId")
     PostDto toDto(_Post entity);
+
 }

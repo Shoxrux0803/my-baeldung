@@ -29,7 +29,7 @@ public class ArticleDto extends GenericDto {
 
     List<PostDto> postDtoList;
 
-    List<RateDto> rateDtoList;
+//    List<RateDto> rateDtoList;
 
     Long viewCount;
 

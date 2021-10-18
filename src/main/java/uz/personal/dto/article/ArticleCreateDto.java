@@ -21,7 +21,7 @@ import javax.validation.constraints.Size;
 public class ArticleCreateDto extends GenericCrudDto {
 
     @ApiModelProperty(required = true)
-    @Size(min = 10, message = " min size %s")
+    @Size(min = 10, message = "Minimum size of article must be 10!")
     String text;
 
     @NotNull(message = "Title cannot be null!")

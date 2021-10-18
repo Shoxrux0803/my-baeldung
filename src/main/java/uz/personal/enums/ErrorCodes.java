@@ -13,6 +13,7 @@ public enum ErrorCodes {
     OBJECT_IS_NULL("OBJECT_IS_NULL", "Provided object: %s is null"),
     OBJECT_NOT_NULL("OBJECT_NOT_NULL", "Provided object: %s is not null"),
     OBJECT_ID_REQUIRED("OBJECT_ID_REQUIRED", "%s id not provided"),
+    OBJECT_IS_NOT_UPDATED("OBJECT_IS_NOT_UPDATED", "%s is not updated!"),
     OBJECT_GIVEN_FIELD_REQUIRED("OBJECT_GIVEN_FIELD_REQUIRED", "Provided field : %s of %s is required"),
     ACCESS_DENIED("ACCESS_DENIED", "You do not have access for %s"),
     PASSWORD_INCORRECT("PASSWORD_INCORRECT", "Password is incorrect"),

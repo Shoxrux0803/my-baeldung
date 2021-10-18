@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.validator.constraints.Range;
 import uz.personal.dto.GenericCrudDto;
 
 import static lombok.AccessLevel.PRIVATE;
@@ -20,6 +21,7 @@ import static lombok.AccessLevel.PRIVATE;
 public class LinkUpdateDto extends GenericCrudDto {
 
     @ApiModelProperty
+    @Range(min = 1, message = "Link id ")
     Long id;
 
     @ApiModelProperty

@@ -30,7 +30,10 @@ import uz.personal.service.article.ILinkService;
 import uz.personal.utils.BaseUtils;
 
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class LinkService extends GenericCrudService<_Link, LinkDto, LinkCreateDto, LinkUpdateDto, LinkCriteria, ILinkRepository> implements ILinkService {
@@ -40,50 +43,60 @@ public class LinkService extends GenericCrudService<_Link, LinkDto, LinkCreateDt
     private final LinkMapper linkMapper;
     private final IArticleRepository articleRepository;
     private final ObjectMapper objectMapper;
+    private final Validator validator;
 
-    public LinkService(ILinkRepository repository, BaseUtils utils, IErrorRepository errorRepository, GenericMapper genericMapper, LinkMapper linkMapper, IArticleRepository articleRepository, ObjectMapper objectMapper) {
+    public LinkService(ILinkRepository repository, BaseUtils utils, IErrorRepository errorRepository, GenericMapper genericMapper, LinkMapper linkMapper, IArticleRepository articleRepository, ObjectMapper objectMapper, Validator validator) {
         super(repository, utils, errorRepository);
         this.genericMapper = genericMapper;
         this.linkMapper = linkMapper;
         this.articleRepository = articleRepository;
         this.objectMapper = objectMapper;
+        this.validator = validator;
     }
 
-
     @Override
-    public ResponseEntity<DataDto<LinkDto>> get(Long id) {
+    public ResponseEntity<DataDto<LinkDto>> get(final Long id) {
         _Link link = repository.find(LinkCriteria.childBuilder().selfId(id).build());
         validate(link, id);
         LinkDto linkDto = linkMapper.toDto(link);
-//        linkDto.setArticleId(link.getArticle().getId());
         return new ResponseEntity<>(new DataDto<>(linkDto), HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<DataDto<List<LinkDto>>> getAll(LinkCriteria criteria) {
+    public ResponseEntity<DataDto<List<LinkDto>>> getAll(final LinkCriteria criteria) {
         Long total = repository.getTotalCount(criteria);
-//        List<LinkDto> linkDto = linkMapper.toDto(repository.findAll(criteria));
         return new ResponseEntity<>(new DataDto<>(linkMapper.toDto(repository.findAll(criteria)), total), HttpStatus.OK);
-
     }
 
     @Override
     public ResponseEntity<DataDto<GenericDto>> create(final LinkCreateDto dto) {
 
-        _Article article = articleRepository.find(dto.getArticleId());
+        Set<ConstraintViolation<LinkCreateDto>> violations = validator.validate(dto);
+
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (ConstraintViolation<LinkCreateDto> constraintViolation : violations) {
+                sb.append(constraintViolation.getMessage()).append(" ");
+            }
+            throw new ValidationException(errorRepository.getErrorMessage(ErrorCodes.OBJECT_IS_NULL, utils.toErrorParams(sb)));
+        }
+
         if (dto.getStartIndex() > dto.getEndIndex()) {
-            throw new RuntimeException("[startIndex] cannot be greater[endIndex]");
+            throw new ValidationException("The endIndex cannot be greater from startIndex!");
+        }
+
+        _Article article = articleRepository.find(dto.getArticleId());
+        if (utils.isEmpty(article)){
+            throw new ValidationException(errorRepository.getErrorMessage(ErrorCodes.USER_NOT_FOUND_ID, utils.toErrorParams("Article", dto.getArticleId())));
         }
         _Link link = linkMapper.fromCreateDto(dto);
 
         link.setArticle(article);
-
         baseValidation(link);
 
         repository.save(link);
 
         return new ResponseEntity<>(new DataDto<>(genericMapper.fromDomain(link)), HttpStatus.CREATED);
-
     }
 
     @Override
@@ -91,9 +104,8 @@ public class LinkService extends GenericCrudService<_Link, LinkDto, LinkCreateDt
     public ResponseEntity<DataDto<LinkDto>> update(final LinkUpdateDto dto) {
 
         if (utils.isEmpty(dto.getId())) {
-            throw new IdRequiredException(errorRepository.getErrorMessage(ErrorCodes.OBJECT_ID_REQUIRED, "Link"));
+            throw new IdRequiredException(errorRepository.getErrorMessage(ErrorCodes.OBJECT_ID_REQUIRED, "Rate"));
         }
-
 
         _Link link = repository.find(dto.getId());
 
@@ -104,13 +116,10 @@ public class LinkService extends GenericCrudService<_Link, LinkDto, LinkCreateDt
         try {
             objectMapper.updateValue(link, dto);
         } catch (JsonMappingException e) {
-            throw new RuntimeException("The link has not been changed!!!"); // todo PM new exception
+            throw new ValidationException(errorRepository.getErrorMessage(ErrorCodes.OBJECT_IS_NOT_UPDATED, utils.toErrorParams("Link")));
         }
 
-//        baseValidation(link);
-
         repository.update(link);
-
         repository.save(link);
 
         return get(dto.getId());
@@ -122,7 +131,17 @@ public class LinkService extends GenericCrudService<_Link, LinkDto, LinkCreateDt
     public ResponseEntity<DataDto<Boolean>> delete(Long id) {
         _Link link = repository.find(id);
         validate(link, id);
-        repository.delete(link);// link bazada saqlanib qolishi kerakmi
+        repository.delete(link);
+        return new ResponseEntity<>(new DataDto<>(true), HttpStatus.OK);
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<DataDto<Boolean>> deleteAllByArticleId(Long articleId) {
+        List<_Link> linkList = repository.findAll(LinkCriteria.childBuilder().articleId(articleId).build());
+
+        linkList.forEach(repository::delete);
+
         return new ResponseEntity<>(new DataDto<>(true), HttpStatus.OK);
     }
 
@@ -142,16 +161,6 @@ public class LinkService extends GenericCrudService<_Link, LinkDto, LinkCreateDt
             logger.error(String.format("Link with id '%s' not found", id));
             throw new ValidationException(errorRepository.getErrorMessage(ErrorCodes.USER_NOT_FOUND_ID, utils.toErrorParams("Link", id)));
         }
-    }
-
-    @Override
-    @Transactional
-    public ResponseEntity<DataDto<Boolean>> deleteAllByArticleId(Long articleId) {
-        List<_Link> linkList = repository.findAll(LinkCriteria.childBuilder().articleId(articleId).build());
-
-        linkList.forEach(repository::delete);
-
-        return new ResponseEntity<>(new DataDto<>(true), HttpStatus.OK);
     }
 
 }

@@ -17,6 +17,7 @@ import uz.personal.dto.GenericDto;
 import uz.personal.dto.article.PostCreateDto;
 import uz.personal.dto.article.PostDto;
 import uz.personal.dto.article.PostUpdateDto;
+import uz.personal.dto.article.RateCreateDto;
 import uz.personal.enums.ErrorCodes;
 import uz.personal.exception.GenericRuntimeException;
 import uz.personal.exception.IdRequiredException;
@@ -33,7 +34,10 @@ import uz.personal.service.article.IPostService;
 import uz.personal.utils.BaseUtils;
 
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class PostService extends GenericCrudService<_Post, PostDto, PostCreateDto, PostUpdateDto, PostCriteria, IPostRepository> implements IPostService {
@@ -44,14 +48,16 @@ public class PostService extends GenericCrudService<_Post, PostDto, PostCreateDt
     private final PostMapper postMapper;
     private final ObjectMapper objectMapper;
     private final IUserRepository userRepository;
+    private final Validator validator;
 
-    public PostService(IPostRepository repository, BaseUtils utils, IErrorRepository errorRepository, GenericMapper genericMapper, IArticleRepository articleRepository, PostMapper postMapper, ObjectMapper objectMapper, IUserRepository userRepository) {
+    public PostService(IPostRepository repository, BaseUtils utils, IErrorRepository errorRepository, GenericMapper genericMapper, IArticleRepository articleRepository, PostMapper postMapper, ObjectMapper objectMapper, IUserRepository userRepository, Validator validator) {
         super(repository, utils, errorRepository);
         this.genericMapper = genericMapper;
         this.articleRepository = articleRepository;
         this.postMapper = postMapper;
         this.objectMapper = objectMapper;
         this.userRepository = userRepository;
+        this.validator = validator;
     }
 
     @Override
@@ -59,7 +65,6 @@ public class PostService extends GenericCrudService<_Post, PostDto, PostCreateDt
         _Post post = repository.find(PostCriteria.childBuilder().selfId(id).build());
         validate(post, id);
         PostDto postDto = postMapper.toDto(post);
-//        linkDto.setArticleId(link.getArticle().getId());
         return new ResponseEntity<>(new DataDto<>(postDto), HttpStatus.OK);
     }
 
@@ -68,12 +73,21 @@ public class PostService extends GenericCrudService<_Post, PostDto, PostCreateDt
     @Override
     public ResponseEntity<DataDto<List<PostDto>>> getAll(PostCriteria criteria) {
         Long total = repository.getTotalCount(criteria);
-//        List<PostDto> PostDto = linkMapper.toDto(repository.findAll(criteria));
         return new ResponseEntity<>(new DataDto<>(postMapper.toDto(repository.findAll(criteria)), total), HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<DataDto<GenericDto>> create(final PostCreateDto dto) {
+
+        Set<ConstraintViolation<PostCreateDto>> violations = validator.validate(dto);
+
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (ConstraintViolation<PostCreateDto> constraintViolation : violations) {
+                sb.append(constraintViolation.getMessage()).append(" ");
+            }
+            throw new ValidationException(sb.toString());
+        }
 
         _Article article = articleRepository.find(dto.getArticleId());
         if (utils.isEmpty(article)) {
@@ -82,7 +96,7 @@ public class PostService extends GenericCrudService<_Post, PostDto, PostCreateDt
         }
 
         if (!article.getAllowComment()){
-            throw new GenericRuntimeException("You cannot write comment to this article!");
+            throw new GenericRuntimeException("You cannot write comment to this article!"); // todo commentga ruxsat berish uchun exception
         }
 
         _User user = userRepository.find(dto.getUserId());
@@ -121,13 +135,12 @@ public class PostService extends GenericCrudService<_Post, PostDto, PostCreateDt
         try {
             objectMapper.updateValue(post, dto);
         } catch (JsonMappingException e) {
-            throw new GenericRuntimeException("The link has not been updated!!!"); // todo PM new exception
+            throw new ValidationException(errorRepository.getErrorMessage(ErrorCodes.OBJECT_IS_NOT_UPDATED, utils.toErrorParams("Post"))); // todo buni validatsiyada ishlash keremi yo objectMapper bilanmi?
         }
 
 //        baseValidation(link);
 
         repository.update(post);
-
         repository.save(post);
 
         return get(dto.getId());
@@ -139,7 +152,7 @@ public class PostService extends GenericCrudService<_Post, PostDto, PostCreateDt
     public ResponseEntity<DataDto<Boolean>> delete(Long id) {
         _Post post = repository.find(id);
         validate(post, id);
-        repository.delete(post);// link bazada saqlanib qolishi kerakmi
+        repository.delete(post);
         return new ResponseEntity<>(new DataDto<>(true), HttpStatus.OK);
     }
 

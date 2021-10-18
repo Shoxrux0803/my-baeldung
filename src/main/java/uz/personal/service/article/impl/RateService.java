@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import uz.personal.criteria.article.LinkCriteria;
 import uz.personal.criteria.article.RateCriteria;
 import uz.personal.domain.article._Article;
 import uz.personal.domain.article._Rate;
@@ -29,9 +28,15 @@ import uz.personal.service.GenericCrudService;
 import uz.personal.service.article.IRateService;
 import uz.personal.utils.BaseUtils;
 
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 @Service(value = "rateService")
 public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDto, RateUpdateDto, RateCriteria, IRateRepository> implements IRateService {
@@ -44,14 +49,18 @@ public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDt
     private final GenericMapper genericMapper;
     private final IArticleRepository articleRepository;
     private final IUserRepository userRepository;
+    private final EntityManager entityManager;
+    private final Validator validator;
 
     @Autowired
-    public RateService(IRateRepository repository, BaseUtils utils, IErrorRepository errorRepository, RateMapper rateMapper, GenericMapper genericMapper, IArticleRepository articleRepository, IUserRepository userRepository) {
+    public RateService(IRateRepository repository, BaseUtils utils, IErrorRepository errorRepository, RateMapper rateMapper, GenericMapper genericMapper, IArticleRepository articleRepository, IUserRepository userRepository, EntityManager entityManager, Validator validator) {
         super(repository, utils, errorRepository);
         this.rateMapper = rateMapper;
         this.genericMapper = genericMapper;
         this.articleRepository = articleRepository;
         this.userRepository = userRepository;
+        this.entityManager = entityManager;
+        this.validator = validator;
     }
 
     @Override
@@ -69,9 +78,18 @@ public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDt
     }
 
     @Override
-    public ResponseEntity<DataDto<GenericDto>> create(@NotNull RateCreateDto dto) {
+    @Transactional
+    public ResponseEntity<DataDto<GenericDto>> create(RateCreateDto dto) {
 
-        // todo validatsiya jarayonida null ga tekshirmayapti ???
+        Set<ConstraintViolation<RateCreateDto>> violations = validator.validate(dto);
+
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (ConstraintViolation<RateCreateDto> constraintViolation : violations) {
+                sb.append(constraintViolation.getMessage()).append(" ");
+            }
+            throw new ValidationException(sb.toString());
+        }
 
         _Article article = articleRepository.find(dto.getArticleId());
         if (utils.isEmpty(article)) {
@@ -90,10 +108,12 @@ public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDt
 
         rate.setUser(user);
         rate.setArticle(article);
-
-        avgRate(rate.getArticle().getId(), article);
-//        rate.setArticle(article);
         repository.save(rate);
+
+        ResponseEntity<DataDto<Double>> dataDtoResponseEntity = avgRate(rate.getArticle().getId());
+        article.setRate(Objects.requireNonNull(dataDtoResponseEntity.getBody()).getData());
+//        articleRepository.update(article);
+        articleRepository.save(article);
 
         return new ResponseEntity<>(new DataDto<>(genericMapper.fromDomain(rate)), HttpStatus.CREATED);
     }
@@ -102,6 +122,17 @@ public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDt
     @Transactional
     @Override
     public ResponseEntity<DataDto<RateDto>> update(@NotNull RateUpdateDto dto) {
+
+        Set<ConstraintViolation<RateUpdateDto>> violations = validator.validate(dto);
+
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (ConstraintViolation<RateUpdateDto> constraintViolation : violations) {
+                sb.append(constraintViolation.getMessage()).append(" ");
+            }
+            throw new ValidationException(errorRepository.getErrorMessage(ErrorCodes.OBJECT_IS_NULL, utils.toErrorParams(sb)));
+        }
+
         if (utils.isEmpty(dto.getId())) {
             throw new IdRequiredException(errorRepository.getErrorMessage(ErrorCodes.OBJECT_ID_REQUIRED, "Rate"));
         }
@@ -112,11 +143,15 @@ public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDt
         baseValidation(rate);
 
         rate.setRate(rate.getRate());
-        rate.setArticle(rate.getArticle());
+        _Article article = rate.getArticle();
+        rate.setArticle(article);
         repository.save(rate);
 
-        return get(rate.getId());
+        ResponseEntity<DataDto<Double>> dataDtoResponseEntity = avgRate(rate.getArticle().getId());
+        article.setRate(Objects.requireNonNull(dataDtoResponseEntity.getBody()).getData());
+        articleRepository.save(article);
 
+        return get(rate.getId());
     }
 
     @Transactional
@@ -128,30 +163,22 @@ public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDt
         return new ResponseEntity<>(new DataDto<>(true), HttpStatus.OK);
     }
 
-
-    @Override
-    public ResponseEntity<DataDto<Double>> avgRate(@NotNull Long dto, final _Article article) {
-        RateCriteria rateCriteria = new RateCriteria(); // todo criteria ni final qilib olsam boladimi
-        rateCriteria.setArticleId(dto);
-        List<_Rate> rate = repository.findAll(rateCriteria);
-
-        assert rate != null;
-        Double rateArticle = (rate.stream().mapToDouble(_Rate::getRate).sum()) / rate.size();
-        article.setRate(rateArticle);
-        articleRepository.update(article);
-
-        return new ResponseEntity<>(new DataDto<>(article.getRate()), HttpStatus.OK);
-
-    }
-
     @Transactional
     @Override
     public ResponseEntity<DataDto<Boolean>> deleteAllByArticleId(Long articleId) {
         List<_Rate> rateList = repository.findAll(RateCriteria.childBuilder().articleId(articleId).build());
-
         rateList.forEach(repository::delete);
-
         return new ResponseEntity<>(new DataDto<>(true), HttpStatus.OK);
+    }
+
+    public ResponseEntity<DataDto<Double>> avgRate(Long articleId) {
+        try {
+            Double rate = (double) Math.round((Double) entityManager.createQuery("SELECT (cast(sum(t.rate) as double)) / count(*) FROM _Rate t WHERE t.article = '" + articleId + "'").getSingleResult() * 10) / 10;
+            return new ResponseEntity<>(new DataDto<>(rate), HttpStatus.OK);
+        } catch (NoResultException ex) {
+            logger.error(ex.getMessage());
+            throw new RuntimeException(String.format("Rate with this article id '%s' not found", articleId));
+        }
     }
 
     @Override
@@ -161,7 +188,6 @@ public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDt
         }
     }
 
-
     @Override
     public void validate(_Rate entity, Long id) {
         if (utils.isEmpty(entity)) {
@@ -169,15 +195,5 @@ public class RateService extends GenericCrudService<_Rate, RateDto, RateCreateDt
             throw new ValidationException(errorRepository.getErrorMessage(ErrorCodes.OBJECT_NOT_FOUND_ID, utils.toErrorParams("Rate", id)));
         }
     }
-
-//    @Override
-//    public Double avgRate(Long article) {
-//        try {
-//            return (_User) entityManager.createQuery("SELECT t FROM _User t WHERE t.id = '" + id + "' ORDER BY t.id DESC ").getSingleResult();
-//        } catch (NoResultException ex) {
-//            logger.error(ex.getMessage());
-//            throw new RuntimeException(String.format("User with id '%s' not found", id));
-//        }
-//    }
 
 }

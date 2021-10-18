@@ -15,6 +15,7 @@ import uz.personal.dto.GenericDto;
 import uz.personal.dto.article.ArticleCreateDto;
 import uz.personal.dto.article.ArticleDto;
 import uz.personal.dto.article.ArticleUpdateDto;
+import uz.personal.dto.article.PostCreateDto;
 import uz.personal.enums.ErrorCodes;
 import uz.personal.enums.State;
 import uz.personal.exception.IdRequiredException;
@@ -30,8 +31,11 @@ import uz.personal.service.article.IArticleService;
 import uz.personal.utils.BaseUtils;
 
 import javax.transaction.Transactional;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Set;
 
 @Service(value = "articleService")
 public class ArticleService extends GenericCrudService<_Article, ArticleDto, ArticleCreateDto, ArticleUpdateDto, ArticleCriteria, IArticleRepository> implements IArticleService {
@@ -44,9 +48,10 @@ public class ArticleService extends GenericCrudService<_Article, ArticleDto, Art
     private final LinkService linkService;
     private final RateService rateService;
     private final PostService postService;
+    private final Validator validator;
 
     @Autowired
-    public ArticleService(IArticleRepository repository, BaseUtils utils, IErrorRepository errorRepository, IUserRepository userRepository, GenericMapper genericMapper, ArticleMapper articleMapper, ObjectMapper objectMapper, LinkService linkService, RateService rateService, PostService postService) {
+    public ArticleService(IArticleRepository repository, BaseUtils utils, IErrorRepository errorRepository, IUserRepository userRepository, GenericMapper genericMapper, ArticleMapper articleMapper, ObjectMapper objectMapper, LinkService linkService, RateService rateService, PostService postService, Validator validator) {
         super(repository, utils, errorRepository);
         this.userRepository = userRepository;
         this.genericMapper = genericMapper;
@@ -55,6 +60,7 @@ public class ArticleService extends GenericCrudService<_Article, ArticleDto, Art
         this.linkService = linkService;
         this.rateService = rateService;
         this.postService = postService;
+        this.validator = validator;
     }
 
 
@@ -70,7 +76,15 @@ public class ArticleService extends GenericCrudService<_Article, ArticleDto, Art
 //    @PreAuthorize("hasPermission(null, T(uz.personal.enums.Permissions).ARTICLE_CREATE)")
     public ResponseEntity<DataDto<GenericDto>> create(@NotNull ArticleCreateDto dto) {
 
-//        parentId nima uchun kerak
+        Set<ConstraintViolation<ArticleCreateDto>> violations = validator.validate(dto);
+
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (ConstraintViolation<ArticleCreateDto> constraintViolation : violations) {
+                sb.append(constraintViolation.getMessage()).append(" ");
+            }
+            throw new ValidationException(sb.toString());
+        }
 
         _Article article = articleMapper.fromCreateDto(dto);
         article.setState(State.NEW);

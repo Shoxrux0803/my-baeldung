@@ -40,7 +40,7 @@ public class RateController extends ApiController<IRateService> {
 
     @ApiOperation(value = "Rate Create")
     @RequestMapping(value = API_PATH + V_1 + "/rate/create", method = RequestMethod.POST)
-    public ResponseEntity<DataDto<GenericDto>> createRate(@Valid @RequestBody RateCreateDto dto) {
+    public ResponseEntity<DataDto<GenericDto>> createRate(@RequestBody RateCreateDto dto) {
         return service.create(dto);
     }
 
@@ -64,13 +64,12 @@ public class RateController extends ApiController<IRateService> {
         return service.deleteAllByArticleId(articleId);
     }
 
-
-//    @Transactional
-//    @ApiOperation(value = "rate AvgRate")
-//    @RequestMapping(value = API_PATH + V_1 + "/rate/getRateByArticleId", method = RequestMethod.PUT)
-//    public ResponseEntity<DataDto<Double>> avgRate(@RequestBody Long dto) {
-//        return service.avgRate(dto);
-//    }
+    @Transactional
+    @ApiOperation(value = "Rate By Article Id")
+    @RequestMapping(value = API_PATH + V_1 + "/rate/getRateByArticleId/{articleId}", method = RequestMethod.GET)
+    public ResponseEntity<DataDto<Double>> avgRate(@PathVariable("articleId") Long dto) {
+        return service.avgRate(dto);
+    }
 
 
 }

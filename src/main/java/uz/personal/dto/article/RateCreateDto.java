@@ -4,12 +4,11 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.validator.constraints.Range;
 import uz.personal.dto.GenericCrudDto;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 @Getter
 @Setter
@@ -20,14 +19,14 @@ import javax.validation.constraints.Size;
 public class RateCreateDto extends GenericCrudDto {
 
     @ApiModelProperty(required = true)
-    @Size(max = 5, message = "Rate must be between 0 and 5")
-    Integer rate;
+    @Range(min = 0, max = 5, message = "Rate ")
+    Long rate;
 
-    @NotBlank(message = "Article id cannot be null!")
-//    @NotEmpty(message = "Article id cannot be empty!")
+    @NotNull(message = "Article ")
+    @NotEmpty(message = "Article ")
     Long articleId;
 
-    @NotBlank(message = "User id cannot be null!")
-//    @NotEmpty(message = "User id cannot be empty!")
+    @NotNull(message = "User ")
+    @NotEmpty(message = "User ")
     Long userId;
 }
